@@ -1,0 +1,28 @@
+
+<input type="text" id="d-docs-command-input" class="hidden" />
+
+<div id="g-docs-commands-container">
+  <div class="nalu-commands">
+    <button data-shortcut="Ctrl+Alt+0" data-style="Aa">Text</button>
+    <button data-shortcut="Ctrl+Alt+1" data-style="H¹">Heading 1</button>
+    <button data-shortcut="Ctrl+Alt+2" data-style="H²">Heading 2</button>
+    <button data-shortcut="Ctrl+Alt+3" data-style="H³">Heading 3</button>
+    <button data-shortcut="Ctrl+Shift+7" data-style="12">Numbered list</button>
+    <button data-shortcut="Ctrl+Shift+8" data-style="•">Bulleted list</button>
+    <button data-shortcut="Ctrl+Shift+9" data-style="☑">TODO list</button>
+    <button data-function="embedGoogle" data-style="📁">Sheets</button>
+    <button data-function="embedGoogle" data-style="📁">Docs</button>
+    <button data-function="embedGoogle" data-style="📁">Slides</button>
+    <button data-function="uploadImage" data-style="🖼️">Upload image</button>
+    <span class="hidden">No command found</span>
+  </div>
+
+  <div class="nalu-embed hidden">
+    <div class="nalu-embed-link">
+      <span class="nalu-embed-title">Embed your file</span>
+      <input id="nalu-embed-input" placeholder="Paste your sheet link..." />
+      <span class="nalu-embed-alert js-embedAlert hidden"></span>
+      <button id="nalu-embed-button">Embed</button>
+    </div>
+  </div>
+</div>

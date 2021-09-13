@@ -1,0 +1,26 @@
+{
+  "name": "Nalu Doc Manager",
+  "description": "Manager your google doc",
+  "version": "1.0",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "webNavigation",
+    "clipboardRead",
+    "clipboardWrite"
+  ],
+  "web_accessible_resources": [
+    "src/views/*"
+  ],
+  "background": {
+      "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "css": ["src/css/main.css"],
+      "js": ["src/js/lib/jquery-3.6.0.min.js", "src/js/main.js"]
+    }
+  ],
+  "manifest_version": 2
+}
