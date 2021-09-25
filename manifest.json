@@ -17,9 +17,14 @@
   },
   "content_scripts": [
     {
+      "js": ["src/js/main.js"],
+      "matches": ["*://*.docs.google.com/*"],
+      "run_at": "document_start"
+    },
+    {
       "matches": ["http://*/*", "https://*/*"],
       "css": ["src/css/main.css"],
-      "js": ["src/js/lib/jquery-3.6.0.min.js", "src/js/main.js"]
+      "js": ["src/js/lib/jquery-3.6.0.min.js"]
     }
   ],
   "manifest_version": 2

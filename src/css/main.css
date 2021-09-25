@@ -88,8 +88,7 @@
     content: attr(data-placeholder);
 }
 
-
-
+/* Embed */
 .nalu-embed {
     padding: 12px;
 }
@@ -155,3 +154,64 @@
     padding: 8px;
     cursor: pointer;
 }
+
+.container-nalu-frame {
+    background-color: rgb(222, 222, 222);
+}
+
+.nalu-frame {
+    height: 490px;
+    width: 155%;
+    transform: scale(.82);
+    transform-origin: -70px 56%;
+    position: relative;
+    top: -50px;
+    box-shadow: 0px 4px 5px rgb(0 0 0 / 12%);
+    transition: all .3s;
+    border-radius: 10px;
+}
+
+.nalu-frame:hover {
+    transform: scale(0.84) translateX(-15px);
+}
+
+#nalu-embed-button.hidden {
+    display: block !important;
+}
+
+.stop-scrolling {
+    overflow: "hidden" !important;
+}
+
+
+/* .loader {
+	border: .2em solid transparent;
+	border-top-color: currentcolor;
+	border-radius: 50%;
+	animation: 1s loader linear infinite;
+	position: relative;
+}
+
+.loader:before {
+    content: '';
+    display: block;
+    width: inherit;
+    height: inherit;
+    position: absolute;
+    top: -.2em;
+    ;
+    left: -.2em;
+    ;
+    border: .2em solid currentcolor;
+    border-radius: 50%;
+    opacity: .5;
+}
+
+@keyframes loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+} */

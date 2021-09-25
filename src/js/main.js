@@ -1,3 +1,5 @@
+console.log("BASE INITIALIZE");
+
 isCommandPopupOpen = false;
 firstRun = true;
 KEY_EMBED = '[[KEY_EMBED_NALU]]';
@@ -16,54 +18,48 @@ src = {
     "word_node": {}
   }
 }
-eventHandlers = {};
 
-chrome.runtime.onMessage.addListener(
-  async function(request, sender, sendResponse) {
-    if (request.message === 'open-doc') {
-      console.log("INITIALIZE");
+window.addEventListener('load', async () => {
+  console.log("INITIALIZE");
 
-      if (firstRun) {
-        console.log("TESTE FIRST RUN");
-        loadCommandPopup();
+  await loadCommandPopup();
+  setAllElements();
+  setAllListenerPopup();
+  handlePlaceholder();
 
-        setTimeout(() => {
-          setAllElements();
-          handleEmbedLinks();
-          handlePlaceholder();
-          setAllListenerPopup();
-        }, 1000);
-      }
+  setTimeout(() => handleEmbedLinks(), 1500);
+});
 
-      firstRun = false;
-    }
-  }
-);
-
-function handleEmbedLinks() {
-  let allParagraphs = document.querySelectorAll(".kix-paragraphrenderer");
+function handleEmbedLinks(sheet = null) {
   let setFrameLink = (paragraph, text) => {
     const link = text.split(KEY_EMBED)[0].replace(/[^\x20-\x7E]/g, '');
     const image = paragraph.querySelector('.kix-embeddedobject-view');
+
     if (!image || !link || paragraph.children[0].classList.contains('hidden')) return;
 
     replaceImgWithVideo(paragraph, link);
   }
 
-  allParagraphs.forEach(paragraph => {
-    let hasEmbedKey = paragraph.textContent.includes(KEY_EMBED);
-    if (hasEmbedKey) {
-      setTimeout(() => setFrameLink(paragraph, paragraph.textContent), 500);
-    }
+  let getAllParagraphs = () => {
+    return sheet ? sheet.querySelectorAll('.kix-paragraphrenderer') : document.querySelectorAll(".kix-paragraphrenderer");
+  }
+
+  getAllParagraphs().forEach(paragraph => {
+    const hasEmbedKey = paragraph.textContent.includes(KEY_EMBED);
+    if (hasEmbedKey) setFrameLink(paragraph, paragraph.textContent);
   });
 }
 
 function handlePlaceholder() {
   const carretEl = document.querySelector("#kix-current-user-cursor-caret");
-
+  const addPlaceHolder = (wordNode) => {
+    wordNode.setAttribute("data-placeholder", "Type '/' for commands");
+    wordNode.classList.add("line-placeholder");
+  }
   const handleCarretChange = (mutationsList, observer) => {
     removePlaceholder();
-    if(isCommandPopupOpen) return;
+
+    if (isCommandPopupOpen) return;
 
     const carretBounds = carretEl.getBoundingClientRect();
 
@@ -74,17 +70,11 @@ function handlePlaceholder() {
 
     if (!lineEl) return;
 
-    const wordNode = lineEl.parentElement.classList.contains(
-      "kix-wordhtmlgenerator-word-node"
-    ) ? lineEl.parentElement
-      : lineEl.parentElement.querySelector(".kix-wordhtmlgenerator-word-node");
-
+    const wordNode = lineEl.parentElement.classList.contains("kix-wordhtmlgenerator-word-node")
+      ? lineEl.parentElement : lineEl.parentElement.querySelector(".kix-wordhtmlgenerator-word-node");
     const text = wordNode?.textContent;
 
-    if (text?.length < 3) {
-      wordNode.setAttribute("data-placeholder", "Type '/' for commands");
-      wordNode.classList.add("line-placeholder");
-    }
+    if (text?.length < 3) addPlaceHolder(wordNode);
   };
 
   const observerAction = new MutationObserver(handleCarretChange);
@@ -260,12 +250,25 @@ function setAllListenerPopup() {
 
 function setEditorEvents() {
   const textIframeEl = document.querySelector(".docs-texteventtarget-iframe").contentDocument;
+  const editor = document.querySelector(".kix-appview-editor");
+
+  editor.addEventListener("scroll", () => {
+    const allSheets = document.querySelectorAll(".kix-page");
+    const currentSheet = [...allSheets].find(sheet => isScrolledIntoView(sheet));
+
+    const previousSheet = currentSheet.previousElementSibling;
+    const nextSheet = currentSheet.nextElementSibling;
+
+    if (currentSheet) handleEmbedLinks(currentSheet);
+    if (previousSheet) handleEmbedLinks(previousSheet);
+    if (nextSheet) handleEmbedLinks(nextSheet);
+  })
 
   textIframeEl.addEventListener("keyup", ev => {
     if (ev.key === "Backspace" || ev.key === "Ctrl") {
       removeEmbedSrc();
     }
-  })
+  });
 }
 
 function removeEmbedSrc() {
@@ -458,7 +461,7 @@ function handleEmbedPopup(e) {
   let embedValue = e.target.value;
   let embed_key = "";
 
-  if (isValidUrl(embedValue)) {
+  if (true) {
     textIframeEl.dispatchEvent(new KeyboardEvent("keydown", {
       key: "Backspace",
       code: "Backspace",
@@ -485,6 +488,7 @@ function handleEmbedPopup(e) {
         keyCode: 13,
         which: 13
       }));
+      indexParagraph = 0;
       handleEmbedLinks();
     }, 700);
 
@@ -511,16 +515,6 @@ function getCurrentParagraph() {
   return paragraph;
 }
 
-function removeAllListeners(targetNode, event) {
-  eventHandlers[event]
-    .filter(({ node }) => node === targetNode)
-    .forEach(({ node, handler, capture }) => node.removeEventListener(event, handler, capture))
-
-  eventHandlers[event] = eventHandlers[event].filter(
-    ({ node }) => node !== targetNode,
-  )
-}
-
 function isValidUrl(string) {
   let url;
 
@@ -537,8 +531,23 @@ function replaceImgWithVideo(paragraph, frameURL) {
   paragraph.style.left = "-70px";
   paragraph.style.zIndex = 100;
 
-  let frameSrc = document.createElement('DIV');
-  frameSrc.innerHTML = `<iframe width="${paragraph.offsetWidth + 140}" height="${paragraph.offsetHeight - 3}" src="${frameURL}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; geolocation" allowfullscreen></iframe>`;
+  let removeScrollEditor = () => {
+    const editor = document.querySelector(".kix-appview-editor");
+    editor.style.overflowY = "hidden";
+  }
+
+  let addScrollEditor = () => {
+    const editor = document.querySelector(".kix-appview-editor");
+    editor.style.overflowY = "auto";
+  }
+
+  let frameSrc = document.createElement('div');
+
+  frameSrc.classList.add("container-nalu-frame", "loader-05");
+  frameSrc.style.height = `${paragraph.offsetHeight}px`;
+  frameSrc.innerHTML = `<iframe style="display: none;" loading="lazy" width="${paragraph.offsetWidth + 140}" height="${paragraph.offsetHeight}" src="${frameURL}" class="nalu-frame" frameborder="0" allowfullscreen></iframe>`;
+
+  frameSrc.querySelector('iframe').onload = () => frameSrc.querySelector('iframe').style.display='block';
 
   Object.values(paragraph.children).forEach((line, idx) => {
     if (idx == 0) {
@@ -613,12 +622,10 @@ function shortcut(key, type = "keydown", ctrlKey = false, altKey = false, shiftK
 }
 
 async function loadCommandPopup() {
-  if (!firstRun) return;
-
   const urlSrc = chrome.extension.getURL("src/views/popupCommand.html");
   const src = await fetchHtmlAsText(urlSrc);
 
-  document.body.insertAdjacentHTML("beforeend", src);
+  return document.body.insertAdjacentHTML("beforeend", src);
 };
 
 // UTILS
@@ -637,4 +644,18 @@ NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
           this[i].parentElement.removeChild(this[i]);
       }
   }
+}
+
+
+
+function isScrolledIntoView(el) {
+  const rect = el.getBoundingClientRect();
+  const elemTop = rect.top;
+  const elemBottom = rect.bottom;
+
+  // Only completely visible elements return true:
+  // var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+
+  const isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+  return isVisible;
 }

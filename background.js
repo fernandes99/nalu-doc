@@ -1,7 +1,7 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (tab.url.includes("docs.google.com") && changeInfo.status == "complete" && tabId === tab.id) {
       chrome.tabs.sendMessage(tabId, {
-        message: 'open-doc',
+        message: 'update-docs',
         url: changeInfo.url
       })
     }
