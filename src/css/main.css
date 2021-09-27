@@ -156,23 +156,29 @@
 }
 
 .container-nalu-frame {
-    background-color: rgb(222, 222, 222);
+    position: relative;
+    left: -10%;
+    width: 120%;
+    background-color: rgb(238 238 238);
 }
 
 .nalu-frame {
-    height: 490px;
-    width: 155%;
-    transform: scale(.82);
-    transform-origin: -70px 56%;
     position: relative;
-    top: -50px;
+    left: 0;
+    top: 0;
+    height: 125%;
+    left: -3%;
+    width: 132%;
+    transform: scale(80%);
+    transform-origin: 0 0;
+
     box-shadow: 0px 4px 5px rgb(0 0 0 / 12%);
-    transition: all .3s;
     border-radius: 10px;
+    transition: all .3s;
 }
 
 .nalu-frame:hover {
-    transform: scale(0.84) translateX(-15px);
+    transform: scale(82%) translateX(-1%);
 }
 
 #nalu-embed-button.hidden {
@@ -183,35 +189,56 @@
     overflow: "hidden" !important;
 }
 
-
-/* .loader {
-	border: .2em solid transparent;
-	border-top-color: currentcolor;
-	border-radius: 50%;
-	animation: 1s loader linear infinite;
-	position: relative;
+.loader:before,
+.loading-embed:before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    position: absolute;
+    top: calc(50% - 30px);
+    right: calc(50% - 20px);
+    padding: 0px;
+    border-radius: 100%;
+    border: 5px solid;
+    border-top-color: rgb(155, 155, 155);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgb(155, 155, 155);
+    border-right-color: rgba(0, 0, 0, 0);
+    -webkit-animation: loader 1s ease-in-out infinite;
+    animation: loader 1s ease-in-out infinite;
+    z-index: 10000;
 }
 
-.loader:before {
-    content: '';
-    display: block;
-    width: inherit;
-    height: inherit;
+.loading-embed:after {
+    background: #00000082;
+    content: "";
+    width: 100%;
+    height: 100%;
     position: absolute;
-    top: -.2em;
-    ;
-    left: -.2em;
-    ;
-    border: .2em solid currentcolor;
-    border-radius: 50%;
-    opacity: .5;
+    top: 0px;
+    z-index: 100;
+    border-radius: 4px;
+}
+
+.loading-embed:before {
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    border-left-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+}
+
+.loading-embed {
+    transition: all .3s;
 }
 
 @keyframes loader {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(360deg);
-	}
-} */
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@-webkit-keyframes loader {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}

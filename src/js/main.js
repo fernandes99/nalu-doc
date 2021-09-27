@@ -276,8 +276,7 @@ function removeEmbedSrc() {
   let hasEmbedSrc = paragraph?.children[0].classList.contains('hidden');
 
   if (hasEmbedSrc) {
-    paragraph.querySelector("iframe").remove();
-    paragraph.style.left = "unset";
+    paragraph.querySelector(".container-nalu-frame").remove();
 
     Object.values(paragraph.children).forEach(line => {
       line.style.display = "block";
@@ -475,23 +474,25 @@ function handleEmbedPopup(e) {
       const data = [new ClipboardItem({ [blob.type]: blob })];
       await navigator.clipboard.write(data);
       textIframeEl.execCommand("paste");
+
+      let paragraph = getCurrentParagraph();
+      if (!paragraph.classList.contains('loading-embed')) paragraph.classList.add('loading-embed');
+
+      setTimeout(() => {
+        textIframeEl.dispatchEvent(new KeyboardEvent("keydown", {
+          key: "Enter",
+          code: "Enter",
+          keyCode: 13,
+          which: 13
+        }));
+
+        handleEmbedLinks();
+      }, 500);
     }
 
     fetch('https://i.imgur.com/wh67veX.png').then(res => res.blob())
       .then(blob => setToClipboard(blob));
-
-    // TODO
-    setTimeout(() => {
-      textIframeEl.dispatchEvent(new KeyboardEvent("keydown", {
-        key: "Enter",
-        code: "Enter",
-        keyCode: 13,
-        which: 13
-      }));
-      indexParagraph = 0;
-      handleEmbedLinks();
-    }, 700);
-
+  
     hideCommandPopup();
   }
   else {
@@ -528,26 +529,20 @@ function isValidUrl(string) {
 }
 
 function replaceImgWithVideo(paragraph, frameURL) {
-  paragraph.style.left = "-70px";
   paragraph.style.zIndex = 100;
-
-  let removeScrollEditor = () => {
-    const editor = document.querySelector(".kix-appview-editor");
-    editor.style.overflowY = "hidden";
-  }
-
-  let addScrollEditor = () => {
-    const editor = document.querySelector(".kix-appview-editor");
-    editor.style.overflowY = "auto";
-  }
 
   let frameSrc = document.createElement('div');
 
-  frameSrc.classList.add("container-nalu-frame", "loader-05");
+  frameSrc.classList.add("container-nalu-frame", "loader");
   frameSrc.style.height = `${paragraph.offsetHeight}px`;
   frameSrc.innerHTML = `<iframe style="display: none;" loading="lazy" width="${paragraph.offsetWidth + 140}" height="${paragraph.offsetHeight}" src="${frameURL}" class="nalu-frame" frameborder="0" allowfullscreen></iframe>`;
 
-  frameSrc.querySelector('iframe').onload = () => frameSrc.querySelector('iframe').style.display='block';
+  frameSrc.querySelector('iframe').onload = () => {
+    frameSrc.classList.remove("loader");
+    frameSrc.querySelector('iframe').style.display='block';
+  }
+
+  if (paragraph.classList.contains('loading-embed')) paragraph.classList.remove('loading-embed');
 
   Object.values(paragraph.children).forEach((line, idx) => {
     if (idx == 0) {
