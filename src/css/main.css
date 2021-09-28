@@ -181,12 +181,45 @@
     transform: scale(82%) translateX(-1%);
 }
 
+.nalu-frame:hover ~ button {
+    opacity: 1;
+}
+
 #nalu-embed-button.hidden {
     display: block !important;
 }
 
-.stop-scrolling {
-    overflow: "hidden" !important;
+.nalu-action-button {
+    opacity: .5;
+    position: absolute;
+    z-index: 100;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #000000d1;
+    border: unset;
+    font-weight: bold;
+    font-size: 13px;
+    color: #ffffff;
+    padding: 1px 1px 0 0;
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.nalu-frame-close {
+    right: -30px;
+    top: -16px;
+}
+
+.nalu-frame-open-link {
+    right: 0px;
+    top: -16px;
+}
+
+.nalu-frame-open-link:before {
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+    font-size: 14px;
+    filter: brightness(0) invert(1);
 }
 
 .loader:before,

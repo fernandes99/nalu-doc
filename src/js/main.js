@@ -271,8 +271,9 @@ function setEditorEvents() {
   });
 }
 
-function removeEmbedSrc() {
-  let paragraph = getCurrentParagraph();
+function removeEmbedSrc(paragraph = null) {
+  if (!paragraph) paragraph = getCurrentParagraph();
+
   let hasEmbedSrc = paragraph?.children[0].classList.contains('hidden');
 
   if (hasEmbedSrc) {
@@ -473,7 +474,7 @@ function handleEmbedPopup(e) {
     const setToClipboard = async blob => {
       const data = [new ClipboardItem({ [blob.type]: blob })];
       await navigator.clipboard.write(data);
-      textIframeEl.execCommand("paste");
+      await textIframeEl.execCommand("paste");
 
       let paragraph = getCurrentParagraph();
       if (!paragraph.classList.contains('loading-embed')) paragraph.classList.add('loading-embed');
@@ -487,7 +488,7 @@ function handleEmbedPopup(e) {
         }));
 
         handleEmbedLinks();
-      }, 500);
+      }, 1000);
     }
 
     fetch('https://i.imgur.com/wh67veX.png').then(res => res.blob())
@@ -535,11 +536,23 @@ function replaceImgWithVideo(paragraph, frameURL) {
 
   frameSrc.classList.add("container-nalu-frame", "loader");
   frameSrc.style.height = `${paragraph.offsetHeight}px`;
-  frameSrc.innerHTML = `<iframe style="display: none;" loading="lazy" width="${paragraph.offsetWidth + 140}" height="${paragraph.offsetHeight}" src="${frameURL}" class="nalu-frame" frameborder="0" allowfullscreen></iframe>`;
+  frameSrc.innerHTML = `
+    <iframe style="display: none;" class="nalu-frame" loading="lazy" width="${paragraph.offsetWidth + 140}" height="${paragraph.offsetHeight}" src="${frameURL}" frameborder="0" allowfullscreen></iframe>
+    <button class="nalu-action-button nalu-frame-close">X</button>
+    <button class="nalu-action-button nalu-frame-open-link"></button>
+  `;
 
   frameSrc.querySelector('iframe').onload = () => {
     frameSrc.classList.remove("loader");
     frameSrc.querySelector('iframe').style.display='block';
+  }
+
+  frameSrc.querySelector('.nalu-frame-open-link').onclick = () => {
+    window.open(frameURL, '_blank').focus();
+  }
+
+  frameSrc.querySelector('.nalu-frame-close').onclick = () => {
+    removeEmbedSrc(paragraph);
   }
 
   if (paragraph.classList.contains('loading-embed')) paragraph.classList.remove('loading-embed');
